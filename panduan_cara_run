@@ -1,0 +1,16 @@
+Cara run:
+
+Buka 2 cmd, satu di folder backend, satu di folder frontend.
+
+Misal di gw:
+C:\Users\chris\Documents\UNPAR\Semester 7\Proyek Data Science 2\palm-health-monitoring\backend>
+C:\Users\chris\Documents\UNPAR\Semester 7\Proyek Data Science 2\palm-health-monitoring\frontend>
+
+Di cmd backend:
+venv\Scripts\activate
+uvicorn main:app --reload --port 8000
+
+Di cmd frontend:
+npm run dev
+
+Buka http://localhost:5173/
