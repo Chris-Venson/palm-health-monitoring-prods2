@@ -1,0 +1,5 @@
+harus ada / install dulu:
+
+earthengine-api
+fastapi
+uvicorn
