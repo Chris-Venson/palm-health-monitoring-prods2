@@ -3,3 +3,5 @@ harus ada / install dulu:
 earthengine-api
 fastapi
 uvicorn
+
+kalo blm install, run di cmd: pip install earthengine-api fastapi uvicorn
