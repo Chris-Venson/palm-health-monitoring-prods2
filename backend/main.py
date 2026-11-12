@@ -36,6 +36,9 @@ boundary = (
 
 roi = boundary.geometry()
 
+sawit_count = ee.Image(
+    "projects/proyek-ds-488707/assets/sawit_classification_count_2015_2025"
+)
 
 # ==========================================
 # 3. SENTINEL-2 CLOUD MASK
@@ -99,13 +102,13 @@ def create_boundary_image():
     return boundary_image
 
 
+
 # ==========================================
 # 6. GENERATE MAP TILE URLS
 # ==========================================
 
 @lru_cache(maxsize=1)
 def get_map_layers():
-
     satellite = create_satellite_image()
 
     rgb_map = satellite.getMapId({
@@ -118,9 +121,20 @@ def get_map_layers():
         "palette": ["FFFFFF"]
     })
 
+    count_map = sawit_count.getMapId({
+        "min": 0,
+        "max": 11,
+        "palette": [
+            "67000d", "a50f15", "cb181d", "ef3b2c",
+            "fb6a4a", "c7e9c0", "a1d99b", "74c476",
+            "41ab5d", "238b45", "006d2c", "00441b"
+        ]
+    })
+
     return {
         "satellite": rgb_map["tile_fetcher"].url_format,
-        "boundary": boundary_map["tile_fetcher"].url_format
+        "boundary": boundary_map["tile_fetcher"].url_format,
+        "sawitCount": count_map["tile_fetcher"].url_format
     }
 
 
