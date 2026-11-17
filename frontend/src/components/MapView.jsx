@@ -14,6 +14,12 @@ import "leaflet/dist/leaflet.css";
 const API_URL = "http://localhost:8000";
 const SAWIT_LAYER_NAME = "Sawit Classification Count (2015–2025)";
 
+// Highest zoom the map allows (matches the Google base layers)
+const MAX_ZOOM = 20;
+// Highest zoom GEE tiles are requested at; beyond this Leaflet upscales them.
+// Sentinel-2 is 10 m/pixel, so there's no extra detail past about z17-18.
+const MAX_NATIVE_ZOOM = 18;
+
 
 function MapResize() {
 
@@ -61,6 +67,8 @@ function OpacityTileLayer({ url, opacity, attribution }) {
             ref={ref}
             url={url}
             opacity={opacity}
+            maxZoom={MAX_ZOOM}
+            maxNativeZoom={MAX_NATIVE_ZOOM}
             attribution={attribution}
         />
     );
@@ -199,6 +207,8 @@ export default function MapView() {
                     <LayersControl.BaseLayer name="Sentinel-2 RGB (GEE)">
                         <TileLayer
                             url={layers.satellite}
+                            maxZoom={MAX_ZOOM}
+                            maxNativeZoom={MAX_NATIVE_ZOOM}
                             attribution="Google Earth Engine / Copernicus Sentinel-2"
                         />
                     </LayersControl.BaseLayer>
@@ -233,6 +243,8 @@ export default function MapView() {
                         <TileLayer
                             url={layers.boundary}
                             opacity={1}
+                            maxZoom={MAX_ZOOM}
+                            maxNativeZoom={MAX_NATIVE_ZOOM}
                             attribution="Google Earth Engine"
                         />
                     </LayersControl.Overlay>
