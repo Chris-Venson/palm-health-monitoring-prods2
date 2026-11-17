@@ -2,7 +2,7 @@ import { useState } from "react";
 import MapPanel from "../components/MapPanel";
 
 const districts = [
-  ["Rambah Hilir", "74,21%"],
+  ["Rambah Hilir", "66,95%"],
   ["Tambusai", "78,82%"],
   ["Tambusai Utara", "75,29%"],
   ["Rambah", "73,76%"],

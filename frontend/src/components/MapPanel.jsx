@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import {
   MapContainer,
@@ -13,6 +12,10 @@ import {
 import "leaflet/dist/leaflet.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+// Zoom level settings
+const MAX_ZOOM = 20;
+const MAX_NATIVE_ZOOM = 18;
 
 function MapControls() {
   const map = useMap();
@@ -69,7 +72,7 @@ function MapResize() {
 export default function MapPanel({ compact = false }) {
   const [layers, setLayers] = useState(null);
   const [error, setError] = useState("");
-  const [activeLayer, setActiveLayer] = useState("Kesehatan Sawit");
+  const [activeLayer, setActiveLayer] = useState("Deteksi Sawit");
   const [opacity, setOpacity] = useState(0.85);
 
   useEffect(() => {
@@ -85,7 +88,7 @@ export default function MapPanel({ compact = false }) {
         return response.json();
       })
       .then((data) => {
-        if (!data.satellite || !data.boundary || !data.sawitCount) {
+        if (!data.boundary || !data.sawitCount) {
           throw new Error("URL layer GEE belum lengkap.");
         }
 
@@ -108,22 +111,27 @@ export default function MapPanel({ compact = false }) {
           <MapContainer
             center={[0.95, 100.32]}
             zoom={11}
+            maxZoom={MAX_ZOOM}
             scrollWheelZoom={true}
             className="gee-map"
           >
             <MapResize />
 
-            {/* Citra Sentinel-2 dari GEE */}
+            {/* Base Layer: Google Hybrid (Menampilkan seluruh dunia / area sekitar) */}
             <TileLayer
-              url={layers.satellite}
-              attribution="Google Earth Engine / Copernicus Sentinel-2"
+              url="https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
+              subdomains={["mt0", "mt1", "mt2", "mt3"]}
+              maxZoom={MAX_ZOOM}
+              attribution="&copy; Google"
             />
 
-            {/* Layer klasifikasi sawit */}
-            {activeLayer === "Kesehatan Sawit" && (
+            {/* Layer deteksi sawit */}
+            {activeLayer === "Deteksi Sawit" && (
               <TileLayer
                 url={layers.sawitCount}
                 opacity={opacity}
+                maxZoom={MAX_ZOOM}
+                maxNativeZoom={MAX_NATIVE_ZOOM}
                 attribution="Google Earth Engine"
               />
             )}
@@ -132,6 +140,8 @@ export default function MapPanel({ compact = false }) {
             <TileLayer
               url={layers.boundary}
               opacity={1}
+              maxZoom={MAX_ZOOM}
+              maxNativeZoom={MAX_NATIVE_ZOOM}
               attribution="Google Earth Engine"
             />
 
@@ -160,14 +170,14 @@ export default function MapPanel({ compact = false }) {
         <div className="map-layer-tabs">
           <b>Layer:</b>
 
-          {["RGB", "Deteksi Sawit", "Kesehatan Sawit"].map((item) => (
+          {["Deteksi Sawit", "Kesehatan Sawit"].map((item) => (
             <button
               key={item}
               type="button"
               className={activeLayer === item ? "selected" : ""}
-              disabled={item === "Deteksi Sawit"}
+              disabled={item === "Kesehatan Sawit"}
               title={
-                item === "Deteksi Sawit"
+                item === "Kesehatan Sawit"
                   ? "Layer belum tersedia dari backend"
                   : ""
               }
@@ -182,16 +192,16 @@ export default function MapPanel({ compact = false }) {
         <div className="map-legend">
           <strong>Legenda</strong>
 
-          {activeLayer === "Kesehatan Sawit" ? (
+          {activeLayer === "Deteksi Sawit" ? (
             <>
               <span>
                 <i className="legend-dot healthy" />
-                Sawit Sehat
+                Sawit
               </span>
 
               <span>
                 <i className="legend-dot sick" />
-                Sawit Sakit
+                Non-Sawit
               </span>
 
               <span>
@@ -215,7 +225,7 @@ export default function MapPanel({ compact = false }) {
               </label>
             </>
           ) : (
-            <span>Citra Sentinel-2 RGB</span>
+            <span>Layer belum tersedia</span>
           )}
 
           <hr />
@@ -227,7 +237,7 @@ export default function MapPanel({ compact = false }) {
         <div className="map-place-label">Rambah Hilir</div>
 
         <div className="map-credit">
-          Google Earth Engine · Sentinel-2
+          Google Earth Engine · Google Hybrid
         </div>
 
       </div>

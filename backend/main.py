@@ -1,6 +1,5 @@
-
 import ee
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from functools import lru_cache
 
@@ -24,7 +23,7 @@ app.add_middleware(
 
 
 # ==========================================
-# 2. LOAD RAMBAH HILIR BOUNDARY
+# 2. LOAD RAMBAH HILIR BOUNDARY & ASSETS
 # ==========================================
 
 boundary = (
@@ -139,7 +138,70 @@ def get_map_layers():
 
 
 # ==========================================
-# 7. API ENDPOINTS
+# 7. CALCULATE AREA STATISTICS (GEE)
+# ==========================================
+
+@lru_cache(maxsize=32)
+def calculate_statistics(district_name: str = "Rambah Hilir"):
+    if district_name == "Semua Kecamatan":
+        dist_boundary = ee.FeatureCollection(
+            "projects/proyek-ds-488707/assets/gadm41_IDN_3"
+        )
+    else:
+        dist_boundary = (
+            ee.FeatureCollection(
+                "projects/proyek-ds-488707/assets/gadm41_IDN_3"
+            )
+            .filter(ee.Filter.eq("NAME_3", district_name))
+        )
+
+    dist_roi = dist_boundary.geometry()
+    pixel_area_ha = ee.Image.pixelArea().divide(10000)
+
+    # Combine calculations into single reduceRegion call for speed
+    combined = ee.Image.cat([
+        pixel_area_ha.rename("total_area"),
+        pixel_area_ha.updateMask(sawit_count.gte(5)).rename("sawit_area"),
+        pixel_area_ha.updateMask(
+            sawit_count.lt(5).And(sawit_count.gte(0))
+        ).rename("non_sawit_area"),
+    ])
+
+    stats = combined.reduceRegion(
+        reducer=ee.Reducer.sum(),
+        geometry=dist_roi,
+        scale=30,
+        maxPixels=1e9,
+    ).getInfo()
+
+    total_area = float(stats.get("total_area") or 0.0)
+    sawit_area = float(stats.get("sawit_area") or 0.0)
+    non_sawit_area = float(stats.get("non_sawit_area") or 0.0)
+
+    classified_area = sawit_area + non_sawit_area
+    unidentified_area = max(0.0, total_area - classified_area)
+
+    sawit_pct = round((sawit_area / total_area * 100), 2) if total_area > 0 else 0.0
+    non_sawit_pct = round((non_sawit_area / total_area * 100), 2) if total_area > 0 else 0.0
+    unidentified_pct = round((unidentified_area / total_area * 100), 2) if total_area > 0 else 0.0
+
+    has_data = classified_area > 100.0
+
+    return {
+        "district": district_name,
+        "totalAreaHa": round(total_area, 2),
+        "sawitHa": round(sawit_area, 2),
+        "sawitPct": sawit_pct,
+        "nonSawitHa": round(non_sawit_area, 2),
+        "nonSawitPct": non_sawit_pct,
+        "unidentifiedHa": round(unidentified_area, 2),
+        "unidentifiedPct": unidentified_pct,
+        "hasData": has_data,
+    }
+
+
+# ==========================================
+# 8. API ENDPOINTS
 # ==========================================
 
 @app.get("/")
@@ -155,3 +217,9 @@ def home():
 def map_layers():
 
     return get_map_layers()
+
+
+@app.get("/api/statistics")
+def statistics(district: str = Query("Rambah Hilir")):
+
+    return calculate_statistics(district)
