@@ -4,6 +4,8 @@ import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import Dashboard from "./pages/Dashboard";
 import SpatialAnalysis from "./pages/SpatialAnalysis";
+import Reports from "./pages/Reports";
+import About from "./pages/About";
 
 const navigation = [
   { id: "dashboard", label: "Beranda", icon: LayoutDashboard },
@@ -27,18 +29,8 @@ export default function App() {
         <Topbar />
         {activePage === "dashboard" && <Dashboard />}
         {activePage === "spatial" && <SpatialAnalysis />}
-        {activePage === "reports" && (
-          <section className="placeholder-page">
-            <h1>Laporan</h1>
-            <p>Halaman laporan akan dikembangkan pada tahap berikutnya.</p>
-          </section>
-        )}
-        {activePage === "about" && (
-          <section className="placeholder-page">
-            <h1>Tentang Aplikasi</h1>
-            <p>Palm Health Monitoring — Kabupaten Rokan Hulu.</p>
-          </section>
-        )}
+        {activePage === "reports" && <Reports />}
+        {activePage === "about" && <About />}
       </main>
     </div>
   );
