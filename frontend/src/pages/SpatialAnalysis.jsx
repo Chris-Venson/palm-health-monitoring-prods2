@@ -59,7 +59,7 @@ export default function SpatialAnalysis() {
 
       <div className="analysis-grid">
         <div className="analysis-main">
-          <MapPanel compact />
+          <MapPanel district={district} compact />
           <div className="available-layers">
             <strong>Layer tersedia</strong>
             <div className="layer-list">

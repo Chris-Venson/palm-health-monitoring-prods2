@@ -69,7 +69,19 @@ function MapResize() {
   return null;
 }
 
-export default function MapPanel({ compact = false }) {
+function MapFlyTo({ center, zoom }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (center && center.length === 2) {
+      map.flyTo(center, zoom || 11, { duration: 1.2 });
+    }
+  }, [center, zoom, map]);
+
+  return null;
+}
+
+export default function MapPanel({ district = "Rambah Hilir", compact = false }) {
   const [layers, setLayers] = useState(null);
   const [error, setError] = useState("");
   const [activeLayer, setActiveLayer] = useState("Deteksi Sawit");
@@ -78,7 +90,7 @@ export default function MapPanel({ compact = false }) {
   useEffect(() => {
     const controller = new AbortController();
 
-    fetch(`${API_URL}/api/map-layers`, {
+    fetch(`${API_URL}/api/map-layers?district=${encodeURIComponent(district)}`, {
       signal: controller.signal,
     })
       .then((response) => {
@@ -101,7 +113,7 @@ export default function MapPanel({ compact = false }) {
       });
 
     return () => controller.abort();
-  }, []);
+  }, [district]);
 
   return (
     <section className={`map-panel ${compact ? "map-compact" : ""}`}>
@@ -109,14 +121,15 @@ export default function MapPanel({ compact = false }) {
 
         {layers && (
           <MapContainer
-            center={[0.95, 100.32]}
-            zoom={11}
+            center={layers.center || [0.9735, 100.3607]}
+            zoom={layers.zoom || 11}
             maxZoom={MAX_ZOOM}
             scrollWheelZoom={true}
             zoomControl={false}
             className="gee-map"
           >
             <MapResize />
+            <MapFlyTo center={layers.center} zoom={layers.zoom} />
 
             {/* Base Layer: Google Hybrid (Menampilkan seluruh dunia / area sekitar) */}
             <TileLayer
@@ -126,9 +139,21 @@ export default function MapPanel({ compact = false }) {
               attribution="&copy; Google"
             />
 
+            {/* Batas semua 16 kecamatan (selalu terlihat di seluruh peta) */}
+            {layers.allBoundaries && (
+              <TileLayer
+                url={layers.allBoundaries}
+                opacity={1}
+                maxZoom={MAX_ZOOM}
+                maxNativeZoom={MAX_NATIVE_ZOOM}
+                attribution="Google Earth Engine"
+              />
+            )}
+
             {/* Layer deteksi sawit */}
             {activeLayer === "Deteksi Sawit" && (
               <TileLayer
+                key={`sawit-${district}`}
                 url={layers.sawitCount}
                 opacity={opacity}
                 maxZoom={MAX_ZOOM}
@@ -137,8 +162,9 @@ export default function MapPanel({ compact = false }) {
               />
             )}
 
-            {/* Batas wilayah Rambah Hilir */}
+            {/* Batas wilayah kecamatan aktif (garis tebal) */}
             <TileLayer
+              key={`boundary-${district}`}
               url={layers.boundary}
               opacity={1}
               maxZoom={MAX_ZOOM}
@@ -161,7 +187,7 @@ export default function MapPanel({ compact = false }) {
             ) : (
               <>
                 <div className="map-loader" />
-                <strong>Memuat peta Google Earth Engine...</strong>
+                <strong>Memuat peta Google Earth Engine ({district})...</strong>
               </>
             )}
           </div>
@@ -231,11 +257,14 @@ export default function MapPanel({ compact = false }) {
 
           <hr />
           <span className="legend-muted">
-            □ Batas Kecamatan Rambah Hilir
+            — Batas 16 Kecamatan
+          </span>
+          <span className="legend-muted">
+            □ Batas {district === "Semua Kecamatan" ? "Kabupaten Rokan Hulu" : `Kecamatan ${district}`}
           </span>
         </div>
 
-        <div className="map-place-label">Rambah Hilir</div>
+        <div className="map-place-label">{district}</div>
 
         <div className="map-credit">
           Google Earth Engine · Google Hybrid
