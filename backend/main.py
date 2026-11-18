@@ -120,7 +120,7 @@ def get_map_layers():
         "palette": ["FFFFFF"]
     })
 
-    count_map = sawit_count.getMapId({
+    count_map = sawit_count.clip(roi).getMapId({
         "min": 0,
         "max": 11,
         "palette": [

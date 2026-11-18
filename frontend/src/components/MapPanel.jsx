@@ -113,6 +113,7 @@ export default function MapPanel({ compact = false }) {
             zoom={11}
             maxZoom={MAX_ZOOM}
             scrollWheelZoom={true}
+            zoomControl={false}
             className="gee-map"
           >
             <MapResize />
