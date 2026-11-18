@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   MapContainer,
   TileLayer,
+  GeoJSON,
   useMap,
 } from "react-leaflet";
 import {
@@ -10,6 +11,7 @@ import {
   LocateFixed,
 } from "lucide-react";
 import "leaflet/dist/leaflet.css";
+import districtsGeoJson from "../data/rokan_hulu_districts.json";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -81,7 +83,7 @@ function MapFlyTo({ center, zoom }) {
   return null;
 }
 
-export default function MapPanel({ district = "Rambah Hilir", compact = false }) {
+export default function MapPanel({ district = "Rambah Hilir", onSelectDistrict, compact = false }) {
   const [layers, setLayers] = useState(null);
   const [error, setError] = useState("");
   const [activeLayer, setActiveLayer] = useState("Deteksi Sawit");
@@ -139,17 +141,6 @@ export default function MapPanel({ district = "Rambah Hilir", compact = false })
               attribution="&copy; Google"
             />
 
-            {/* Batas semua 16 kecamatan (selalu terlihat di seluruh peta) */}
-            {layers.allBoundaries && (
-              <TileLayer
-                url={layers.allBoundaries}
-                opacity={1}
-                maxZoom={MAX_ZOOM}
-                maxNativeZoom={MAX_NATIVE_ZOOM}
-                attribution="Google Earth Engine"
-              />
-            )}
-
             {/* Layer deteksi sawit */}
             {activeLayer === "Deteksi Sawit" && (
               <TileLayer
@@ -162,14 +153,53 @@ export default function MapPanel({ district = "Rambah Hilir", compact = false })
               />
             )}
 
-            {/* Batas wilayah kecamatan aktif (garis tebal) */}
-            <TileLayer
-              key={`boundary-${district}`}
-              url={layers.boundary}
-              opacity={1}
-              maxZoom={MAX_ZOOM}
-              maxNativeZoom={MAX_NATIVE_ZOOM}
-              attribution="Google Earth Engine"
+            {/* Batas interaktif 16 kecamatan (Bisa diklik & hover tooltip) */}
+            <GeoJSON
+              key={`geojson-${district}`}
+              data={districtsGeoJson}
+              style={(feature) => {
+                const isSelected = feature?.properties?.NAME_3 === district;
+                return {
+                  color: "#FFFFFF",
+                  weight: isSelected ? 4 : 2,
+                  opacity: 0.95,
+                  fillColor: "#47834b",
+                  fillOpacity: isSelected ? 0.08 : 0.001,
+                };
+              }}
+              onEachFeature={(feature, layer) => {
+                const name = feature?.properties?.NAME_3;
+                if (!name) return;
+
+                layer.bindTooltip(`Kecamatan ${name}`, {
+                  sticky: true,
+                  direction: "top",
+                  className: "map-tooltip",
+                });
+
+                layer.on({
+                  click: () => {
+                    if (onSelectDistrict) {
+                      onSelectDistrict(name);
+                    }
+                  },
+                  mouseover: (e) => {
+                    const target = e.target;
+                    target.setStyle({
+                      weight: 3,
+                      fillOpacity: 0.25,
+                    });
+                    target.bringToFront();
+                  },
+                  mouseout: (e) => {
+                    const isSelected = name === district;
+                    e.target.setStyle({
+                      weight: isSelected ? 4 : 2,
+                      fillOpacity: isSelected ? 0.08 : 0.001,
+                    });
+                  },
+                });
+              }}
             />
 
             <MapControls />
@@ -257,7 +287,7 @@ export default function MapPanel({ district = "Rambah Hilir", compact = false })
 
           <hr />
           <span className="legend-muted">
-            — Batas 16 Kecamatan
+            — Batas 16 Kecamatan (Klik peta)
           </span>
           <span className="legend-muted">
             □ Batas {district === "Semua Kecamatan" ? "Kabupaten Rokan Hulu" : `Kecamatan ${district}`}

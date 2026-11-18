@@ -239,3 +239,19 @@ select { width: 100%; background: #fbfcfb; border: 1px solid #e5ebe6; border-rad
     height: 360px;
   }
 }
+
+.map-tooltip {
+  background: rgba(23, 37, 26, 0.92) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 6px !important;
+  font-family: 'DM Sans', Arial, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  padding: 4px 9px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+  pointer-events: none;
+}
+.map-tooltip::before {
+  border-top-color: rgba(23, 37, 26, 0.92) !important;
+}

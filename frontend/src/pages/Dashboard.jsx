@@ -214,7 +214,10 @@ export default function Dashboard() {
       </div>
 
       <div className="dashboard-grid">
-        <MapPanel district={selectedDistrict} />
+        <MapPanel
+          district={selectedDistrict}
+          onSelectDistrict={setSelectedDistrict}
+        />
         <HealthDetails
           selectedDistrict={selectedDistrict}
           onSelectDistrict={setSelectedDistrict}
