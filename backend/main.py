@@ -84,8 +84,33 @@ def mask_sentinel2(image):
 
 
 # ==========================================
-# 4. CREATE BOUNDARY IMAGE
+# 4. CREATE SATELLITE & BOUNDARY IMAGES
 # ==========================================
+
+def create_satellite_image(target_roi, year: int = 2025):
+    if year >= 2025:
+        start_date = "2024-08-01"
+        end_date = "2025-10-01"
+    else:
+        start_date = f"{year}-01-01"
+        end_date = f"{year}-12-31"
+
+    collection = (
+        ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
+        .filterBounds(target_roi)
+        .filterDate(start_date, end_date)
+        .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 80))
+        .map(mask_sentinel2)
+    )
+
+    image = (
+        collection
+        .median()
+        .clip(target_roi)
+    )
+
+    return image.select(["B4", "B3", "B2"])
+
 
 def create_boundary_image(feature_collection, width=5):
 
@@ -115,8 +140,8 @@ def get_all_boundaries_tile_url():
 # 5. GENERATE MAP TILE URLS PER KECAMATAN
 # ==========================================
 
-@lru_cache(maxsize=32)
-def get_map_layers(district_name: str = "Rambah Hilir"):
+@lru_cache(maxsize=128)
+def get_map_layers(district_name: str = "Rambah Hilir", year: int = 2025):
     norm_name = normalize_district_name(district_name)
 
     if norm_name == "Semua Kecamatan":
@@ -130,6 +155,17 @@ def get_map_layers(district_name: str = "Rambah Hilir"):
         )
 
     dist_roi = dist_boundary.geometry()
+
+    # Sentinel-2 RGB composite only generated for historical years (< 2025)
+    satellite_url = None
+    if year < 2025:
+        satellite_img = create_satellite_image(dist_roi, year)
+        satellite_map = satellite_img.getMapId({
+            "min": 0,
+            "max": 3000,
+            "gamma": 1.2
+        })
+        satellite_url = satellite_map["tile_fetcher"].url_format
 
     # Thicker active boundary (width=4)
     boundary_map = create_boundary_image(dist_boundary, width=4).getMapId({
@@ -157,9 +193,11 @@ def get_map_layers(district_name: str = "Rambah Hilir"):
         "allBoundaries": get_all_boundaries_tile_url(),
         "boundary": boundary_map["tile_fetcher"].url_format,
         "sawitCount": count_map["tile_fetcher"].url_format,
+        "satellite": satellite_url,
         "center": center,
         "zoom": zoom,
         "district": district_name,
+        "year": year,
     }
 
 
@@ -240,9 +278,12 @@ def home():
 
 
 @app.get("/api/map-layers")
-def map_layers(district: str = Query("Rambah Hilir")):
+def map_layers(
+    district: str = Query("Rambah Hilir"),
+    year: int = Query(2025, ge=2018, le=2026)
+):
 
-    return get_map_layers(district)
+    return get_map_layers(district, year)
 
 
 @app.get("/api/statistics")
