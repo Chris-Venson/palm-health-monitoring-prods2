@@ -26,6 +26,37 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 const MAX_ZOOM = 20;
 const MAX_NATIVE_ZOOM = 18;
 
+// Centroids for all 16 kecamatan in Rokan Hulu
+const DISTRICT_CENTERS = {
+  "Bangun Purba": [0.9141, 100.191],
+  "Bonai Darussalam": [1.1626, 100.8362],
+  "Kabun": [0.465, 100.746],
+  "Kepenuhan": [1.1327, 100.623],
+  "Kepenuhan Hulu": [0.9896, 100.515],
+  "Kunto Darussalam": [0.9194, 100.6873],
+  "Pagaran Tapah Darussalam": [0.7698, 100.604],
+  "Pendalian IV Koto": [0.5026, 100.4863],
+  "Pendalian Iv Koto": [0.5026, 100.4863],
+  "Rambah": [0.8262, 100.2607],
+  "Rambah Hilir": [0.9735, 100.3607],
+  "Rambah Samo": [0.8184, 100.434],
+  "Rokan IV Koto": [0.5835, 100.3461],
+  "Rokan Iv Koto": [0.5835, 100.3461],
+  "Tambusai": [1.0991, 100.2624],
+  "Tambusai Utara": [1.2855, 100.3142],
+  "Tandun": [0.5873, 100.6077],
+  "Ujung Batu": [0.6925, 100.5262],
+  "Semua Kecamatan": [0.85, 100.45],
+};
+
+function getDistrictCenter(name) {
+  if (!name) return [0.9735, 100.3607];
+  const found = Object.entries(DISTRICT_CENTERS).find(
+    ([k]) => k.toLowerCase() === name.trim().toLowerCase()
+  );
+  return found ? found[1] : [0.9735, 100.3607];
+}
+
 function MapControls({ isFullscreen, onToggleFullscreen }) {
   const map = useMap();
 
@@ -87,19 +118,19 @@ function MapResize({ isFullscreen }) {
   return null;
 }
 
-function MapFlyTo({ center, zoom, district }) {
+function MapFlyTo({ district }) {
   const map = useMap();
   const currentDistrictRef = useRef(district);
 
   useEffect(() => {
     // Only flyTo when the district has actually changed, never on year change
-    if (currentDistrictRef.current !== district) {
+    if (district && currentDistrictRef.current !== district) {
       currentDistrictRef.current = district;
-      if (center && center.length === 2) {
-        map.flyTo(center, zoom || 11, { duration: 1.2 });
-      }
+      const targetCenter = getDistrictCenter(district);
+      const targetZoom = district.toLowerCase().includes("semua") ? 9 : 11;
+      map.flyTo(targetCenter, targetZoom, { duration: 1.2 });
     }
-  }, [district, center, zoom, map]);
+  }, [district, map]);
 
   return null;
 }
@@ -200,15 +231,15 @@ export default function MapPanel({
       >
         {layers && (
           <MapContainer
-            center={layers.center || [0.9735, 100.3607]}
-            zoom={layers.zoom || 11}
+            center={getDistrictCenter(district)}
+            zoom={district.toLowerCase().includes("semua") ? 9 : 11}
             maxZoom={MAX_ZOOM}
             scrollWheelZoom={true}
             zoomControl={false}
             className="gee-map"
           >
             <MapResize isFullscreen={isFullscreen} />
-            <MapFlyTo center={layers.center} zoom={layers.zoom} district={district} />
+            <MapFlyTo district={district} />
 
             {/* Base Layer: Google Hybrid (HD Satellite View, aktif untuk seluruh dunia dan tahun 2025) */}
             <TileLayer
@@ -221,7 +252,7 @@ export default function MapPanel({
             {/* Citra Sentinel-2 RGB hanya untuk tahun-tahun historis (< 2025) */}
             {year < 2025 && layers.satellite && (
               <TileLayer
-                key={`satellite-${district}-${year}`}
+                key={`satellite-${layers.district || district}-${year}`}
                 url={layers.satellite}
                 maxZoom={MAX_ZOOM}
                 maxNativeZoom={MAX_NATIVE_ZOOM}
@@ -243,7 +274,7 @@ export default function MapPanel({
             {/* Layer deteksi sawit */}
             {activeLayer === "Deteksi Sawit" && (
               <TileLayer
-                key={`sawit-${district}`}
+                key={`sawit-${layers.district || district}`}
                 url={layers.sawitCount}
                 opacity={opacity}
                 maxZoom={MAX_ZOOM}
