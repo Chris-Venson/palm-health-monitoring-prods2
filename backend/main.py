@@ -26,9 +26,39 @@ app.add_middleware(
 # 2. ASSETS & COORDINATE LOOKUP
 # ==========================================
 
-sawit_count = ee.Image(
+GADM_COLLECTION = "projects/proyek-ds-488707/assets/gadm41_IDN_3"
+
+DISTRICT_SAWIT_ASSETS = {
+    "Rambah Hilir": "projects/proyek-ds-488707/assets/sawit_classification_count_2015_2025",
+    "Bangun Purba": "projects/proyek-ds-488707/assets/sawit_count_bangun_purba_2015_2025",
+}
+
+default_sawit_count = ee.Image(
     "projects/proyek-ds-488707/assets/sawit_classification_count_2015_2025"
 )
+
+
+def get_district_boundary(norm_name: str) -> ee.FeatureCollection:
+    rokan_hulu = ee.FeatureCollection(GADM_COLLECTION).filter(
+        ee.Filter.eq("NAME_2", "Rokan Hulu")
+    )
+    if norm_name == "Semua Kecamatan":
+        return rokan_hulu
+    return rokan_hulu.filter(ee.Filter.eq("NAME_3", norm_name))
+
+
+def get_sawit_image(norm_name: str) -> ee.Image:
+    if norm_name in DISTRICT_SAWIT_ASSETS:
+        return ee.Image(DISTRICT_SAWIT_ASSETS[norm_name])
+
+    if norm_name == "Semua Kecamatan":
+        clipped_images = [
+            ee.Image(asset_id).clip(get_district_boundary(dist_name).geometry())
+            for dist_name, asset_id in DISTRICT_SAWIT_ASSETS.items()
+        ]
+        return ee.ImageCollection(clipped_images).mosaic()
+
+    return default_sawit_count
 
 # Centroids for all 16 kecamatan in Rokan Hulu
 DISTRICT_CENTERS = {
@@ -144,15 +174,7 @@ def get_all_boundaries_tile_url():
 def get_map_layers(district_name: str = "Rambah Hilir", year: int = 2025):
     norm_name = normalize_district_name(district_name)
 
-    if norm_name == "Semua Kecamatan":
-        dist_boundary = ee.FeatureCollection(
-            "projects/proyek-ds-488707/assets/gadm41_IDN_3"
-        ).filter(ee.Filter.eq("NAME_2", "Rokan Hulu"))
-    else:
-        dist_boundary = (
-            ee.FeatureCollection("projects/proyek-ds-488707/assets/gadm41_IDN_3")
-            .filter(ee.Filter.eq("NAME_3", norm_name))
-        )
+    dist_boundary = get_district_boundary(norm_name)
 
     dist_roi = dist_boundary.geometry()
 
@@ -172,7 +194,8 @@ def get_map_layers(district_name: str = "Rambah Hilir", year: int = 2025):
         "palette": ["FFFFFF"]
     })
 
-    count_map = sawit_count.clip(dist_roi).getMapId({
+    sawit_img = get_sawit_image(norm_name)
+    count_map = sawit_img.clip(dist_roi).getMapId({
         "min": 0,
         "max": 11,
         "palette": [
@@ -209,25 +232,19 @@ def get_map_layers(district_name: str = "Rambah Hilir", year: int = 2025):
 def calculate_statistics(district_name: str = "Rambah Hilir"):
     norm_name = normalize_district_name(district_name)
 
-    if norm_name == "Semua Kecamatan":
-        dist_boundary = ee.FeatureCollection(
-            "projects/proyek-ds-488707/assets/gadm41_IDN_3"
-        ).filter(ee.Filter.eq("NAME_2", "Rokan Hulu"))
-    else:
-        dist_boundary = (
-            ee.FeatureCollection("projects/proyek-ds-488707/assets/gadm41_IDN_3")
-            .filter(ee.Filter.eq("NAME_3", norm_name))
-        )
+    dist_boundary = get_district_boundary(norm_name)
 
     dist_roi = dist_boundary.geometry()
     pixel_area_ha = ee.Image.pixelArea().divide(10000)
 
+    sawit_img = get_sawit_image(norm_name)
+
     # Combine calculations into single reduceRegion call for speed
     combined = ee.Image.cat([
         pixel_area_ha.rename("total_area"),
-        pixel_area_ha.updateMask(sawit_count.gte(5)).rename("sawit_area"),
+        pixel_area_ha.updateMask(sawit_img.gte(5)).rename("sawit_area"),
         pixel_area_ha.updateMask(
-            sawit_count.lt(5).And(sawit_count.gte(0))
+            sawit_img.lt(5).And(sawit_img.gte(0))
         ).rename("non_sawit_area"),
     ])
 
