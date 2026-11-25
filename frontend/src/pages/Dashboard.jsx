@@ -6,8 +6,8 @@ import MapPanel from "../components/MapPanel";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 const DISTRICTS = [
-  "Rambah Hilir",
   "Semua Kecamatan",
+  "Rambah Hilir",
   "Bangun Purba",
   "Bonai Darussalam",
   "Kabun",

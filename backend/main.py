@@ -31,6 +31,7 @@ GADM_COLLECTION = "projects/proyek-ds-488707/assets/gadm41_IDN_3"
 DISTRICT_SAWIT_ASSETS = {
     "Rambah Hilir": "projects/proyek-ds-488707/assets/sawit_classification_count_2015_2025",
     "Bangun Purba": "projects/proyek-ds-488707/assets/sawit_count_bangun_purba_2015_2025",
+    "Bonai Darussalam": "projects/proyek-ds-488707/assets/sawit_count_bonai_darussalam_2015_2025",
 }
 
 default_sawit_count = ee.Image(
