@@ -1,101 +1,219 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { TreePalm, Check, AlertCircle, Crosshair, Loader2 } from "lucide-react";
 import MapPanel from "../components/MapPanel";
 
-const districts = [
-  ["Rambah Hilir", "74,21%"],
-  ["Tambusai", "78,82%"],
-  ["Tambusai Utara", "75,29%"],
-  ["Rambah", "73,76%"],
-  ["Bangun Purba", "73,84%"],
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+const DISTRICTS = [
+  "Rambah Hilir",
+  "Semua Kecamatan",
+  "Bangun Purba",
+  "Bonai Darussalam",
+  "Kabun",
+  "Kepenuhan",
+  "Kepenuhan Hulu",
+  "Kunto Darussalam",
+  "Pagaran Tapah Darussalam",
+  "Pendalian IV Koto",
+  "Rambah",
+  "Rambah Samo",
+  "Rokan IV Koto",
+  "Tambusai",
+  "Tambusai Utara",
+  "Tandun",
+  "Ujung Batu",
 ];
 
-export default function SpatialAnalysis() {
-  const [district, setDistrict] = useState("Semua Kecamatan");
-  const [layer, setLayer] = useState("Kesehatan Sawit");
-  const [period, setPeriod] = useState("Ags 2024 – Sep 2025");
-  const [opacity, setOpacity] = useState(70);
+function formatHa(value) {
+  if (value === undefined || value === null) return "0 Ha";
+  return value.toLocaleString("id-ID", { maximumFractionDigits: 1 }) + " Ha";
+}
+
+function formatPct(value) {
+  if (value === undefined || value === null) return "0%";
+  return value.toLocaleString("id-ID", { minimumFractionDigits: 1, maximumFractionDigits: 2 }) + "%";
+}
+
+function HealthDetails({ selectedDistrict, onSelectDistrict, data, loading, error }) {
+  const sawitDeg = data ? (data.sawitPct / 100) * 360 : 0;
+  const nonSawitDeg = data ? ((data.sawitPct + data.nonSawitPct) / 100) * 360 : 0;
+  const donutStyle = data
+    ? {
+        background: `conic-gradient(#4c8a51 0deg ${sawitDeg}deg, #e16c60 ${sawitDeg}deg ${nonSawitDeg}deg, #c2cbc3 ${nonSawitDeg}deg 360deg)`,
+      }
+    : undefined;
 
   return (
-    <div className="page">
-      <div className="page-heading">
-        <h1>Analisis Spasial</h1>
-        <p>Eksplorasi layer, distribusi, dan kondisi kesehatan sawit secara geografis</p>
-      </div>
+    <aside className="detail-card">
+      <h3>Pilih Kecamatan</h3>
+      <select
+        value={selectedDistrict}
+        onChange={(e) => onSelectDistrict(e.target.value)}
+      >
+        {DISTRICTS.map((item) => (
+          <option key={item} value={item}>
+            {item}
+          </option>
+        ))}
+      </select>
 
-      <div className="filter-row">
-        <label className="filter-box">PILIH KECAMATAN
-          <select value={district} onChange={(e) => setDistrict(e.target.value)}>
-            <option>Semua Kecamatan</option>
-            <option>Bangun Purba</option>
-            <option>Bonai Darussalam</option>
-            <option>Kabun</option>
-            <option>Kepenuhan</option>
-            <option>Kepenuhan Hulu</option>
-            <option>Kunto Darussalam</option>
-            <option>Pagaran Tapah Darussalam</option>
-            <option>Pendalian IV Koto</option>
-            <option>Rambah</option>
-            <option>Rambah Hilir</option>
-            <option>Rambah Samo</option>
-            <option>Rokan IV Koto</option>
-            <option>Tambusai</option>
-            <option>Tambusai Utara</option>
-            <option>Tandun</option>
-            <option>Ujung Batu</option>
-          </select>
-        </label>
-        <label className="filter-box">LAYER AKTIF
-          <select value={layer} onChange={(e) => setLayer(e.target.value)}>
-            <option>RGB</option><option>Deteksi Sawit</option><option>Kesehatan Sawit</option>
-          </select>
-        </label>
-        <label className="filter-box">RENTANG WAKTU
-          <select value={period} onChange={(e) => setPeriod(e.target.value)}>
-            <option>Ags 2024 – Sep 2025</option><option>Jan 2025 – Jun 2025</option>
-          </select>
-        </label>
-        <button className="export-button" onClick={() => window.print()}>↓ Ekspor Hasil Analisis</button>
-      </div>
+      <h3 className="detail-heading">Detail Informasi</h3>
 
-      <div className="analysis-grid">
-        <div className="analysis-main">
-          <MapPanel compact />
-          <div className="available-layers">
-            <strong>Layer tersedia</strong>
-            <div className="layer-list">
-              <div><b>RGB</b><span>Citra natural color</span></div>
-              <div><b>Deteksi Sawit</b><span>Hasil deteksi objek</span></div>
-              <div><b>Kesehatan Sawit</b><span>Klasifikasi kesehatan</span></div>
-              <div><b>NDVI</b><span>Indeks vegetasi</span></div>
+      {loading && (
+        <div style={{ padding: "30px 10px", textAlign: "center", color: "#617065", fontSize: "12px" }}>
+          <Loader2 size={20} className="map-loader" style={{ margin: "0 auto 8px" }} />
+          <span>Menghitung statistik GEE...</span>
+        </div>
+      )}
+
+      {!loading && error && (
+        <div style={{ padding: "20px 10px", textAlign: "center", color: "#e16c60", fontSize: "11px" }}>
+          Gagal memuat statistik dari GEE.
+        </div>
+      )}
+
+      {!loading && data && (
+        <>
+          <div className="donut-wrap">
+            <div className="donut" style={donutStyle}>
+              <div>
+                <b>{formatPct(data.sawitPct)}</b>
+                <small>Sawit</small>
+              </div>
+            </div>
+            <div className="donut-legend">
+              <span>
+                <i className="legend-dot healthy" />
+                Sawit
+                <small>
+                  {formatHa(data.sawitHa)} ({formatPct(data.sawitPct)})
+                </small>
+              </span>
+              <span>
+                <i className="legend-dot sick" />
+                Non-Sawit
+                <small>
+                  {formatHa(data.nonSawitHa)} ({formatPct(data.nonSawitPct)})
+                </small>
+              </span>
+              <span>
+                <i className="legend-dot unknown" />
+                Tidak Teridentifikasi
+                <small>
+                  {formatHa(data.unidentifiedHa)} ({formatPct(data.unidentifiedPct)})
+                </small>
+              </span>
             </div>
           </div>
-        </div>
 
-        <aside className="analysis-settings">
-          <h3>Pengaturan Analisis</h3>
-          <label>Kecamatan<select value={district} onChange={(e) => setDistrict(e.target.value)}>
-            <option>Semua Kecamatan</option><option>Rambah Hilir</option><option>Tambusai</option><option>Rambah</option>
-          </select></label>
-          <label>Layer<select value={layer} onChange={(e) => setLayer(e.target.value)}>
-            <option>RGB</option><option>Deteksi Sawit</option><option>Kesehatan Sawit</option>
-          </select></label>
-          <label>Rentang waktu<select value={period} onChange={(e) => setPeriod(e.target.value)}>
-            <option>Ags 2024 – Sep 2025</option><option>Jan 2025 – Jun 2025</option>
-          </select></label>
-          <label className="opacity-label">Transparansi Layer
-            <input type="range" min="0" max="100" value={opacity} onChange={(e) => setOpacity(e.target.value)} />
-            <small>{opacity}%</small>
-          </label>
-          <button className="apply-button">Terapkan Filter</button>
-          <div className="district-summary">
-            <h3>Ringkasan per Kecamatan</h3>
-            {districts.map(([name, value]) => (
-              <div className="district-row" key={name}>
-                <span>{name}</span><i><b style={{ width: value }} /></i><strong>{value}</strong>
-              </div>
-            ))}
+          <div className="detail-metrics">
+            <div>
+              <span>Luas Sawit</span>
+              <b>{formatHa(data.sawitHa)}</b>
+            </div>
+            <div>
+              <span>Luas Non-Sawit</span>
+              <b>{formatHa(data.nonSawitHa)}</b>
+            </div>
+            <div>
+              <span>Luas Total Wilayah</span>
+              <b>{formatHa(data.totalAreaHa)}</b>
+            </div>
           </div>
-        </aside>
+
+          {!data.hasData && (
+            <p style={{ marginTop: "12px", fontSize: "9px", color: "#8a968d", fontStyle: "italic" }}>
+              * Data klasifikasi GEE saat ini tersedia untuk Kecamatan Rambah Hilir.
+            </p>
+          )}
+        </>
+      )}
+    </aside>
+  );
+}
+
+export default function Dashboard() {
+  const [selectedDistrict, setSelectedDistrict] = useState("Rambah Hilir");
+  const [statsData, setStatsData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let isCancelled = false;
+    setLoading(true);
+    setError(null);
+
+    fetch(`${API_URL}/api/statistics?district=${encodeURIComponent(selectedDistrict)}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Gagal mengambil data statistik");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (!isCancelled) {
+          setStatsData(data);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (!isCancelled) {
+          setError(err.message);
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [selectedDistrict]);
+
+  const cards = [
+    {
+      icon: TreePalm,
+      label: "Total Wilayah",
+      value: statsData ? formatHa(statsData.totalAreaHa) : "...",
+      note: "100% area analisis",
+      tone: "green",
+    },
+    {
+      icon: Check,
+      label: "Sawit",
+      value: statsData ? formatHa(statsData.sawitHa) : "...",
+      note: statsData ? `${formatPct(statsData.sawitPct)} dari total` : "Menghitung...",
+      tone: "green",
+    },
+    {
+      icon: AlertCircle,
+      label: "Non-Sawit",
+      value: statsData ? formatHa(statsData.nonSawitHa) : "...",
+      note: statsData ? `${formatPct(statsData.nonSawitPct)} dari total` : "Menghitung...",
+      tone: "red",
+    },
+    {
+      icon: Crosshair,
+      label: "Area Analisis",
+      value: selectedDistrict,
+      note: "Kabupaten Rokan Hulu",
+      tone: "green",
+    },
+  ];
+
+  return (
+    <div className="page spatial-page">
+
+      <div className="dashboard-grid">
+        <MapPanel
+          district={selectedDistrict}
+          onSelectDistrict={setSelectedDistrict}
+        />
+        <HealthDetails
+          selectedDistrict={selectedDistrict}
+          onSelectDistrict={setSelectedDistrict}
+          data={statsData}
+          loading={loading}
+          error={error}
+        />
       </div>
     </div>
   );

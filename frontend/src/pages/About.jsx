@@ -34,13 +34,6 @@ const features = [
 export default function About() {
   return (
     <div className="page about-page">
-      <div className="page-heading">
-        <h1>Tentang Aplikasi</h1>
-        <p>
-          Mengenal Palm Health Monitoring dan sistem pemantauan
-          kesehatan perkebunan kelapa sawit Kabupaten Rokan Hulu.
-        </p>
-      </div>
 
       {/* Pengenalan aplikasi */}
       <section className="about-hero">

@@ -955,3 +955,1301 @@ select { width: 100%; background: #fbfcfb; border: 1px solid #e5ebe6; border-rad
     font-size: 24px;
   }
 }
+
+
+/* =====================================
+   DASHBOARD OVERVIEW
+===================================== */
+
+.overview-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.overview-page .page-heading {
+  margin-bottom: 0;
+}
+
+.overview-page .stats-grid {
+  margin-bottom: 0;
+}
+
+.overview-chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  min-width: 0;
+}
+
+.overview-card {
+  min-width: 0;
+  background: #ffffff;
+  border: 1px solid #e7ece7;
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 2px 8px rgba(35, 65, 42, 0.035);
+}
+
+.overview-card-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 18px;
+}
+
+.overview-card-heading h3 {
+  margin: 0;
+  color: #26372c;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.overview-card-heading span {
+  color: #8a968d;
+  font-size: 11px;
+}
+
+/* DONUT CHART */
+
+.overview-donut-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  min-height: 180px;
+}
+
+.overview-donut {
+  width: 145px;
+  height: 145px;
+  min-width: 145px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.overview-donut::before {
+  content: "";
+  position: absolute;
+  width: 94px;
+  height: 94px;
+  background: white;
+  border-radius: 50%;
+}
+
+.overview-donut-center {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.overview-donut-center strong {
+  font-size: 19px;
+  color: #26372c;
+}
+
+.overview-donut-center span {
+  font-size: 11px;
+  color: #638367;
+}
+
+.overview-donut-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.overview-donut-legend > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.overview-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.overview-legend-dot.green {
+  background: #568b59;
+}
+
+.overview-legend-dot.red {
+  background: #df786e;
+}
+
+.overview-legend-dot.gray {
+  background: #aeb9b1;
+}
+
+.overview-donut-legend section {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.overview-donut-legend strong {
+  font-size: 11px;
+  color: #344438;
+}
+
+.overview-donut-legend small {
+  font-size: 10px;
+  color: #849087;
+}
+
+/* DISTRICT COMPARISON */
+
+/* Card perbandingan kecamatan */
+.comparison-card {
+  height: 390px;
+  min-height: 390px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Satu baris kecamatan */
+.comparison-item {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+/* Nama kecamatan dan persentase */
+.comparison-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.comparison-label span {
+  color: #475569;
+}
+
+.comparison-label strong {
+  color: #1e293b;
+  white-space: nowrap;
+}
+
+/* Background bar */
+.comparison-bar-track {
+  width: 100%;
+  height: 9px;
+  background: #e8eee9;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* Bar persentase */
+.comparison-bar-fill {
+  height: 100%;
+  background: #36966a;
+  border-radius: 20px;
+  transition: width 0.3s ease;
+}
+
+/* Pesan loading/error */
+.chart-message {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* INSIGHT */
+
+.overview-insight {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #f0f6ef;
+  border: 1px solid #e3ece1;
+  border-radius: 16px;
+  padding: 15px 18px;
+}
+
+.overview-insight-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e0eddf;
+  color: #568b59;
+}
+
+.overview-insight-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.overview-insight-content strong {
+  color: #334b37;
+  font-size: 12px;
+}
+
+.overview-insight-content p {
+  color: #69776b;
+  font-size: 11px;
+  margin: 5px 0 0;
+  line-height: 1.6;
+}
+
+.overview-detail-button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: none;
+  background: transparent;
+  color: #568b59;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.overview-detail-button:hover {
+  color: #345f38;
+}
+
+.overview-loading,
+.overview-empty {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  color: #819083;
+  font-size: 11px;
+}
+
+.overview-error {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #c45e55;
+  background: #fff1ef;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 12px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+  .overview-chart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .overview-donut-content {
+    flex-direction: column;
+  }
+
+  .overview-insight {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .overview-detail-button {
+    margin-left: 55px;
+  }
+
+  .overview-district-row {
+    grid-template-columns: 85px minmax(40px, 1fr) 50px;
+  }
+}
+
+
+/* ==========================================
+   DASHBOARD CHART LAYOUT
+========================================== */
+
+.overview-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 20px;
+}
+
+/* ==========================================
+   CARD HEIGHT
+========================================== */
+
+.overview-card {
+  height: 390px;
+  min-height: 390px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Header card */
+
+.overview-card-heading {
+  flex: 0 0 auto;
+}
+
+/* ==========================================
+   DONUT CARD
+========================================== */
+
+.donut-overview-card .overview-donut-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ==========================================
+   COMPARISON CARD
+========================================== */
+
+.comparison-overview-card {
+  overflow: hidden;
+}
+
+.comparison-card-content {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Scroll hanya pada area grafik */
+
+.comparison-scroll {
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px 8px 12px 0;
+  box-sizing: border-box;
+}
+
+/* Daftar grafik batang */
+
+.comparison-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  height: auto;
+  min-height: min-content;
+}
+
+.comparison-item {
+  flex: 0 0 auto;
+}
+
+/* Scrollbar */
+
+.comparison-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.comparison-scroll::-webkit-scrollbar-track {
+  background: #f1f4f1;
+  border-radius: 10px;
+}
+
+.comparison-scroll::-webkit-scrollbar-thumb {
+  background: #bdcbbd;
+  border-radius: 10px;
+}
+
+.comparison-scroll::-webkit-scrollbar-thumb:hover {
+  background: #8da58e;
+}
+
+/* Loading dan error */
+
+.comparison-card-content .chart-message {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  text-align: center;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 1000px) {
+  .overview-chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .overview-card {
+    height: 390px;
+    min-height: 390px;
+  }
+}
+
+/* =========================================
+   HALAMAN LAPORAN
+========================================= */
+
+.report-page {
+  padding-top: 18px;
+}
+
+.report-page .page-heading {
+  margin-bottom: 16px;
+}
+
+/* FILTER */
+
+.report-filter-row {
+  display: grid;
+  grid-template-columns: 174px 174px minmax(160px, 1fr);
+  gap: 10px;
+  align-items: end;
+  margin-bottom: 10px;
+}
+
+.report-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 9px;
+  background: #fff;
+  border: 1px solid #e7ece7;
+  border-radius: 10px;
+  min-width: 0;
+}
+
+.report-filter span {
+  font-size: 9px;
+  font-weight: 700;
+  color: #718078;
+}
+
+.report-filter select {
+  width: 100%;
+  height: 32px;
+  border: 1px solid #e7ece7;
+  border-radius: 6px;
+  padding: 0 9px;
+  color: #26372c;
+  background: #fbfdfb;
+  font-size: 10px;
+  font-weight: 600;
+  outline: none;
+}
+
+.generate-report-button {
+  justify-self: end;
+  width: 188px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: none;
+  border-radius: 9px;
+  background: #49834a;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.generate-report-button:hover {
+  background: #376e3b;
+}
+
+/* KARTU STATISTIK */
+
+.report-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.report-stat {
+  min-width: 0;
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #e8ede8;
+  border-radius: 11px;
+}
+
+.report-stat-icon {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.report-stat-icon.green {
+  color: #4c8951;
+  background: #edf5ee;
+}
+
+.report-stat-icon.red {
+  color: #e66a60;
+  background: #fff0ef;
+}
+
+.report-stat-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.report-stat-content span {
+  color: #849087;
+  font-size: 9px;
+}
+
+.report-stat-content strong {
+  color: #26352b;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.report-stat-content small {
+  color: #57905b;
+  font-size: 8px;
+}
+
+.report-stat-content small:has(+ span) {
+  color: #e66a60;
+}
+
+/* KARTU GRAFIK */
+
+.report-chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.report-card {
+  min-width: 0;
+  padding: 13px;
+  background: #fff;
+  border: 1px solid #e8ede8;
+  border-radius: 11px;
+}
+
+.report-card h3 {
+  margin: 0;
+  color: #29372e;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.report-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.chart-legend span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #66736a;
+  font-size: 8px;
+}
+
+.healthy-dot,
+.sick-dot,
+.healthy-square,
+.sick-square {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.healthy-dot,
+.healthy-square {
+  background: #4c874b;
+}
+
+.sick-dot,
+.sick-square {
+  background: #e4675d;
+}
+
+.healthy-square,
+.sick-square {
+  border-radius: 1px;
+}
+
+/* GRAFIK GARIS */
+
+.trend-card,
+.district-chart-card {
+  height: 181px;
+}
+
+.trend-chart {
+  display: flex;
+  height: 135px;
+  margin-top: 10px;
+}
+
+.chart-y-labels {
+  width: 30px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2px 0 18px;
+  color: #91a096;
+  font-size: 7px;
+}
+
+.trend-plot {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+.trend-plot svg {
+  width: 100%;
+  height: 112px;
+  overflow: visible;
+}
+
+.chart-grid-line {
+  stroke: #edf0ed;
+  stroke-width: 1;
+}
+
+.healthy-line,
+.sick-line {
+  fill: none;
+  stroke-width: 2.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.healthy-line {
+  stroke: #4c874b;
+}
+
+.sick-line {
+  stroke: #e4675d;
+}
+
+.chart-months {
+  display: flex;
+  justify-content: space-between;
+  color: #829087;
+  font-size: 7px;
+}
+
+/* GRAFIK BATANG */
+
+.district-chart {
+  height: 132px;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 10px 4px 0;
+}
+
+.district-bar-group {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.district-bars {
+  height: 95px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.district-bar {
+  width: min(18px, 38%);
+  border-radius: 4px 4px 2px 2px;
+}
+
+.healthy-bar {
+  background: #4c874b;
+}
+
+.sick-bar {
+  background: #e4675d;
+}
+
+.district-bar-group > span {
+  width: 100%;
+  overflow: hidden;
+  color: #829087;
+  font-size: 7px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* BAGIAN BAWAH */
+
+.report-bottom-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.85fr) minmax(0, 1.75fr);
+  gap: 10px;
+}
+
+.donut-card,
+.table-card {
+  min-height: 167px;
+}
+
+.report-donut-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  height: 125px;
+}
+
+.report-donut {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: conic-gradient(
+    #4c874b 0% 25%,
+    #e9d6d3 25% 37%,
+    #4c874b 37% 62%,
+    #e9d6d3 62% 75%,
+    #4c874b 75% 87%,
+    #e9d6d3 87% 100%
+  );
+  position: relative;
+}
+
+.report-donut::before {
+  content: "";
+  position: absolute;
+  width: 67px;
+  height: 67px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.report-donut-center {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.report-donut-center strong {
+  color: #2c3b30;
+  font-size: 14px;
+}
+
+.report-donut-center span {
+  color: #536358;
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.report-donut-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.report-donut-legend > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.report-donut-legend span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #4c874b;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.report-donut-legend small {
+  padding-left: 12px;
+  color: #8a968e;
+  font-size: 8px;
+}
+
+/* TABEL */
+
+.table-card {
+  overflow: hidden;
+}
+
+.report-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 12px;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-size: 8px;
+}
+
+.report-table th {
+  padding: 7px 5px;
+  color: #718078;
+  font-weight: 600;
+  text-align: left;
+  border-bottom: 1px solid #e9eeea;
+}
+
+.report-table td {
+  padding: 8px 5px;
+  color: #435047;
+  border-bottom: 1px solid #f0f2f0;
+}
+
+.report-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.report-table .percentage-cell {
+  color: #4c874b;
+  font-weight: 700;
+}
+
+.report-footnote {
+  margin-top: 10px;
+  color: #8a968e;
+  font-size: 9px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1050px) {
+  .report-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .report-filter-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .generate-report-button {
+    width: 100%;
+    grid-column: 1 / -1;
+  }
+
+  .report-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .report-chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .report-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .report-filter-row {
+    grid-template-columns: 1fr;
+  }
+
+  .report-card-heading {
+    flex-wrap: wrap;
+  }
+
+  .report-stat-content strong {
+    font-size: 13px;
+  }
+
+  .report-donut-content {
+    gap: 20px;
+  }
+}
+
+/* Card Area Analisis */
+.spatial-page .stat-card:last-child .stat-copy strong {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.25;
+  font-size: 14px;
+}
+
+/* Responsif */
+@media (max-width: 1050px) {
+  .spatial-page .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .spatial-page .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .spatial-page .stat-card:last-child .stat-copy strong {
+    font-size: 12px;
+  }
+}
+
+/* ==========================================
+   SPATIAL ANALYSIS - MENYAMAKAN TINGGI CARD
+========================================== */
+
+.spatial-page {
+  width: 100%;
+  min-width: 0;
+  height: calc(100vh - 44px);
+  padding: 18px 10px 0;
+  box-sizing: border-box;
+}
+
+.spatial-page .dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 270px;
+  gap: 14px;
+  height: calc(100vh - 116px);
+  min-height: 0;
+  align-items: stretch;
+}
+
+/* Card peta */
+.spatial-page .map-panel {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.spatial-page .map-panel .map-art {
+  flex: 1;
+  height: 0;
+  min-height: 0;
+  width: 100%;
+}
+
+/* Card detail */
+.spatial-page .detail-card {
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* Tampilan isi detail */
+.spatial-page .detail-card select {
+  width: 100%;
+}
+
+.spatial-page .detail-card .donut-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0;
+}
+
+.spatial-page .detail-card .donut {
+  flex-shrink: 0;
+}
+
+.spatial-page .detail-card .donut-legend {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Laptop ukuran menengah */
+@media (max-width: 1050px) and (min-width: 721px) {
+  .spatial-page .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr) 245px;
+    height: calc(100vh - 116px);
+  }
+}
+
+/* Mobile */
+@media (max-width: 720px) {
+  .spatial-page {
+    height: auto;
+    padding: 14px 5px;
+  }
+
+  .spatial-page .dashboard-grid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .spatial-page .map-panel {
+    height: 390px;
+  }
+
+  .spatial-page .map-panel .map-art {
+    flex: 1;
+    height: auto;
+  }
+
+  .spatial-page .detail-card {
+    height: auto;
+    min-height: 350px;
+    overflow: visible;
+  }
+}
+
+/* CETAK LAPORAN */
+
+@media print {
+  .sidebar,
+  .topbar,
+  .generate-report-button {
+    display: none !important;
+  }
+
+  .app-shell {
+    display: block;
+    padding: 0;
+  }
+
+  .main-content {
+    width: 100%;
+  }
+
+  .report-page {
+    padding: 10px;
+  }
+
+  .report-card,
+  .report-stat {
+    break-inside: avoid;
+  }
+
+  body {
+    background: white !important;
+  }
+}
+
+
+/* ABOUT PAGE */
+.about-page {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.about-hero {
+  background: linear-gradient(120deg, #173f2c, #286344);
+  border-radius: 16px;
+  padding: 36px;
+  color: white;
+}
+
+.about-hero-content {
+  max-width: 700px;
+}
+
+.about-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 18px;
+  color: #c7e8ce;
+}
+
+.about-hero h2 {
+  font-size: 30px;
+  line-height: 1.3;
+  margin: 0 0 16px;
+}
+
+.about-hero p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #e0eee4;
+  margin: 0;
+}
+
+.about-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.about-section h2 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.about-section > p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #64748b;
+  margin: 0;
+}
+
+.about-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #286344;
+}
+
+.about-section-heading h2 {
+  color: #1e293b;
+}
+
+.about-feature-grid,
+.about-tech-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.about-feature-card,
+.about-tech-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 22px;
+}
+
+.about-feature-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eaf5ed;
+  color: #286344;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.about-feature-card h3,
+.about-tech-card h3 {
+  font-size: 15px;
+  margin: 0 0 9px;
+  color: #1e293b;
+}
+
+.about-feature-card p,
+.about-tech-card p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #64748b;
+  margin: 0;
+}
+
+.about-tech-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.about-tech-card > svg {
+  color: #286344;
+  margin-bottom: 14px;
+}
+
+.about-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px;
+  background: #f0f7f2;
+  border: 1px solid #d9eadf;
+  border-radius: 12px;
+  color: #286344;
+}
+
+.about-info h3 {
+  font-size: 15px;
+  margin: 0 0 10px;
+}
+
+.about-info p {
+  font-size: 13px;
+  color: #526b5b;
+  margin: 5px 0;
+}
+
+@media (max-width: 768px) {
+  .about-feature-grid,
+  .about-tech-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-hero {
+    padding: 24px;
+  }
+
+  .about-hero h2 {
+    font-size: 24px;
+  }
+}

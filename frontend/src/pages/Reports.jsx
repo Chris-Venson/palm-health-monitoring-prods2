@@ -287,13 +287,6 @@ export default function Reports() {
 
   return (
     <div className="page report-page">
-      <div className="page-heading">
-        <h1>Laporan</h1>
-        <p>
-          Ringkasan hasil analisis dan pelaporan kesehatan sawit
-          Kabupaten Rokan Hulu
-        </p>
-      </div>
 
       <div className="report-filter-row">
         <label className="report-filter">
